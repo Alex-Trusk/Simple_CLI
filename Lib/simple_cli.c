@@ -1,12 +1,13 @@
 #include "string.h"
 #include "stdbool.h"
 #include "simple_cli.h"
+#include "stdio.h"
 
 static uint8_t NumCommandsStored = 0;
 
 char* GetNextToken(char* input_string, const char* delimiter)
 {
-    char* token = strtok(input_string, delimiter); // Tokenize using space as the delimiter
+    return strtok(input_string, delimiter); // Tokenize using space as the delimiter
 }
 
 cli_command_t cli_command_list [SIMCLI_MAX_COMMANDS];
@@ -67,7 +68,7 @@ bool ParseCmdArgs(char **argv, cli_command_t* self)
 
 uint8_t AddNewCommand(cli_command_t new_command)
 {
-    if(new_command.c_func==NULL)
+    if(FindCmdByID(new_command.cmd_ID)||(new_command.c_func==NULL))
         return 0;
     cli_command_list[NumCommandsStored++]=new_command;
     return ++NumCommandsStored;
@@ -89,34 +90,43 @@ int8_t ProcessCommand(const char* input_str)
     char *arg_list[SIMCLI_MAX_ARGS+2];
     memset(arg_list,0,sizeof(arg_list));
 
-
     cli_command_t *command;
     if(!end_pos)
-        return -1;
+        return 0;
     *end_pos='\0';
     char* duplicate_str = strdup(input_str);   // new string must be freed
     token =  GetNextToken(duplicate_str," ");
     printf("cmd token = %s\n",token);
     if(token)
     {
-        
-        if(command=FindCmd(token))
+        command=FindCmd(token);
+        if(command)
         {
             printf("Command found\n");
             int i=0;
-            while((token = GetNextToken(NULL," ")))
+            token = GetNextToken(NULL," ");
+            while(token)
             {
                 arg_list[i] = token;
                 ++i;
+            token = GetNextToken(NULL," ");
             }
-            command->c_func(arg_list,command);
-
+            if(command->c_func(arg_list,command))  /*Calling command function*/
+                return (int8_t)command->cmd_ID;
         }
         else
         {
             printf("Command unknown\n");
         }
-
     }
     free (duplicate_str);
+    return 0;
+}
+
+cli_command_t* FindCmdByID(uint8_t cmdID)
+{
+    for(int i = 0; i<NumCommandsStored;++i)
+        if(cli_command_list[i].cmd_ID==cmdID)
+            return &cli_command_list[i];
+    return NULL;
 }

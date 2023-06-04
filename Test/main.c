@@ -1,8 +1,9 @@
 #include "stdio.h"
+#include "simple_cli.h"
 #include "cli_command_set.h"
 
 
-void main()
+int main()
 {
     initSimpleCliSet();
     printf("Prog started\n");
@@ -14,6 +15,8 @@ void main()
     char str6[]="sendfile\n";
     char str7[]="sendfile      -n    100000      -o   -f    feriX1.tct\n";
     char str8[]="sendfileg      -n    100000      -o   -f    feriX1.tct\n";
+    char str9[]="mountsd\n";
+    char str10[]="mountsd      -n    100000      -o   -f    feriX1.tct\n";
     printf("String 1= %s",str1);
     ProcessCommand(str1);
 
@@ -37,5 +40,11 @@ void main()
 
     printf("\nString 8= %s",str8);
     ProcessCommand(str8);
-    getc(NULL);
+
+    printf("\nString 9= %s",str9);
+    ProcessCommand(str9);
+
+    printf("\nString 10= %s",str10);
+    ProcessCommand(str10);
+    return 0;
 }

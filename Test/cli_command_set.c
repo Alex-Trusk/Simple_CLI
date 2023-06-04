@@ -55,7 +55,12 @@ bool sendfile_cmd(char **argv, cli_command_t* self)
 
 bool mountSD_cmd(char **argv, cli_command_t* self)
 {
-
+    if ((argv[0])&&(!self->args_num))
+    {
+        printf("Command doesn't have arguments\n");
+        return false;
+    }
+    return 1;
 }
 
 
@@ -70,7 +75,8 @@ void initSimpleCliSet(void)
                     {.arg_name="-f", .arg_type=ARG_STRING   }
                 },
         .c_func = sendfile_cmd,
-        .cmd_info = "Sends file over BLE NUS"
+        .cmd_info = "Sends file over BLE NUS",
+        .cmd_ID= 0x01
     };
     AddNewCommand(sendfile);
     
@@ -78,9 +84,9 @@ void initSimpleCliSet(void)
     {
         .cmd_name = "mountsd",
         .args_num = 0,
-        .args = {},
         .c_func = mountSD_cmd,
-        .cmd_info = "Initializes SD card interface"
+        .cmd_info = "Initializes SD card interface",
+        .cmd_ID= 0x02
     };
     AddNewCommand(mountSD);
 
