@@ -16,7 +16,7 @@ int main()
     char str7[]="sendfile      -n    100000      -o   -f    feriX1.tct\n";
     char str8[]="sendfileg      -n    100000      -o   -f    feriX1.tct\n";
     char str9[]="mountsd\n";
-    char str10[]="mountsd      -n    100000      -o   -f    feriX1.tct\n";
+    char str10[]="mountsd\r\n";
     printf("String 1= %s",str1);
     ProcessCommand(str1);
 

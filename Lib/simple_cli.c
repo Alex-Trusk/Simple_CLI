@@ -85,16 +85,20 @@ cli_command_t* FindCmd(char* cmd_name)
 }
 int8_t ProcessCommand(const char* input_str)
 {
-    char * end_pos = strchr(input_str, '\n');
     char * token=NULL;
     char *arg_list[SIMCLI_MAX_ARGS+2];
+    cli_command_t *command;
     memset(arg_list,0,sizeof(arg_list));
 
-    cli_command_t *command;
-    if(!end_pos)
-        return 0;
-    *end_pos='\0';
-    char* duplicate_str = strdup(input_str);   // new string must be freed
+    char* duplicate_str=malloc(strlen(input_str));
+    strcpy(duplicate_str,input_str);   // new string must be freed
+    char * end_pos = strchr(duplicate_str, '\0');
+    if(*(end_pos-1)=='\n'||*(end_pos-1)=='\r')
+	{
+		*(end_pos-1)='\0';
+		if(*(end_pos-2)=='\n'||*(end_pos-2)=='\r')
+			*(end_pos-2)='\0';
+	}
     token =  GetNextToken(duplicate_str," ");
     printf("cmd token = %s\n",token);
     if(token)

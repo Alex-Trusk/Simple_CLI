@@ -6,7 +6,7 @@
 #include "stdbool.h"
 /*Forward declaration*/
 struct cli_command_t;
-typedef struct cli_command_t cli_command_t; 
+typedef struct cli_command_t cli_command_s; 
 
 
 #define SIMCLI_MAX_CMD_LEN 128                  /*Max length of a single command */
@@ -41,7 +41,7 @@ typedef struct
  * @brief Command function type 
  * 
  */
-typedef bool (*cmd_function_t)(char **argv, cli_command_t * self);
+typedef bool (*cmd_function_t)(char **argv, cli_command_s * self);
 
 /**
  * @brief Describes CLI command 

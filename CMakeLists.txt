@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.0)
 project(Simple_CLI VERSION 0.1.0)
 
 if(NOT CMAKE_C_FLAGS)
-	set(CMAKE_C_FLAGS "-O3")
+	set(CMAKE_C_FLAGS "-O0 -std=gnu99")
 endif()
 if(NOT CMAKE_C_FLAGS_DEBUG)
 	set(CMAKE_C_FLAGS_DEBUG "-g -ggdb")
