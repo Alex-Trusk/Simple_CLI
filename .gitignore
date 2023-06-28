@@ -79,5 +79,5 @@ sdkconfig*
 dependencies.lock
 
 #project etc
-.docx
-.vsdx
+*.docx
+*.vsdx
