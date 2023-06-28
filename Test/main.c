@@ -1,50 +1,76 @@
 #include "stdio.h"
 #include "simple_cli.h"
 #include "cli_command_set.h"
+#include "string.h"
 
+SIMPLE_CLI_DEF (MainC);         /*Use SIMPLE_CLI_DEF to create Main CLI context object*/
+
+/*This function implements data output routines. It receives data of sizeof(length)
+from command content handler function. For example it could be code that sends 
+data over TX pin of UART interface */
+uint32_t StdOutWrite(const char* data, size_t length)
+{
+	for(size_t i=0;i<length;++i)
+        printf("%c", data[i]);
+	return 0;
+}
+
+/*Highest level context handler. Starts command parse sequence.*/
+bool MainContextHandler(char *data, size_t length, void * _context)
+{
+	const char unknown_cmd[]="Command unknown\n";
+    ((void)(length));
+	int8_t com_res=ProcessCommand(data,(SimpleCliContext_t*)_context);
+	printf("Command : #%d\n",com_res);
+	if(!com_res)
+    {
+        StdOutWrite(unknown_cmd, sizeof(unknown_cmd));
+        return false;
+    } 						
+	return true;
+}
 
 int main()
 {
+    
+    InitCLIcontext(&MainC,MainContextHandler,StdOutWrite,"Main_context");
+    /*Initializing commands set*/
     initSimpleCliSet();
-    printf("Prog started\n");
-    char str1[]="sendfile -n 100000 -o -f feriX1.tct\n";
-    char str2[]="sendfil -n 100000 -o -f feriX1.tct\n";
-    char str3[]="sendfile -o -f feriX1.tct\n";
-    char str4[]="sendfile -n -o -f feriX1.tct\n";
-    char str5[]="sendfile -f -n 100 -o\n";
-    char str6[]="sendfile\n";
-    char str7[]="sendfile      -n    100000      -o   -f    feriX1.tct\n";
-    char str8[]="sendfileg      -n    100000      -o   -f    feriX1.tct\n";
-    char str9[]="mountsd\n";
-    char str10[]="mountsd\r\n";
-    printf("String 1= %s",str1);
-    ProcessCommand(str1);
 
-    printf("\nString 2= %s",str2);
-    ProcessCommand(str2);
+    char str1[]="sendfile -n 10 -o -f feriX1.tct\r\n";
+    char str2[]="sendfile -n 100";
+    char str3[]="mountsd";
+    char str4[]="mount_sd";
+    char str5[]="sendfile -f -n 100";
 
-    printf("\nString 3= %s",str3);
-    ProcessCommand(str3);
+    bool ret_res;
+    printf("\nString 1= %s\n",str1);
+    ret_res=CallContextHandler(&MainC,str1,strlen(str1));  //Command received
+    /*Data flow simulation*/
+    if(ret_res)
+        CallContextHandler(&MainC,"0123456789",strlen("0123456789")); 
+    
+    printf("\nString 2= %s\n",str2);
+    CallContextHandler(&MainC,str2,strlen(str2));   //Command received
+    /*Data flow simulation. 100 bytes*/
+    if(ret_res)
+    {
+        for(int i=0;i<10;++i)
+            CallContextHandler(&MainC,"0123456789",strlen("0123456789")); 
+    }
 
-    printf("\nString 4= %s",str4);
-    ProcessCommand(str4);
+    printf("\nString 3= %s\n",str3);
+    CallContextHandler(&MainC,str3,strlen(str3));   //Command received
 
-    printf("\nString 5= %s",str5);
-    ProcessCommand(str5);
+    printf("\nString 4= %s\n",str4);
+    ret_res=CallContextHandler(&MainC,str4,strlen(str4));   //Command received
+    if(!ret_res)
+        printf("Command unknown\n");
 
-    printf("\nString 6= %s",str6);
-    ProcessCommand(str6);
+    printf("\nString 5= %s\n",str5);
+    ret_res=CallContextHandler(&MainC,str5,strlen(str5));   //Command received
+    if(!ret_res)
+        printf("Command unknown\n");
 
-    printf("\nString 7= %s",str7);
-    ProcessCommand(str7);
-
-    printf("\nString 8= %s",str8);
-    ProcessCommand(str8);
-
-    printf("\nString 9= %s",str9);
-    ProcessCommand(str9);
-
-    printf("\nString 10= %s",str10);
-    ProcessCommand(str10);
     return 0;
 }

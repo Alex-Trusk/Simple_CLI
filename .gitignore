@@ -77,3 +77,7 @@ wifi_manager/doc/
 .vscode/
 sdkconfig*
 dependencies.lock
+
+#project etc
+.docx
+.vsdx
